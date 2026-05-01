@@ -3,20 +3,29 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Assuredia QA Monitoring Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: clients
+    description: Client management
+  - name: testRuns
+    description: Test run management
+  - name: alerts
+    description: Alert management
+  - name: reports
+    description: Reports and analytics
+  - name: dashboard
+    description: Dashboard aggregations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,282 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List all monitored clients
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [clients]
+      summary: Add a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClientBody"
+      responses:
+        "201":
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
+  /clients/{id}:
+    get:
+      operationId: getClient
+      tags: [clients]
+      summary: Get a single client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Client details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+    put:
+      operationId: updateClient
+      tags: [clients]
+      summary: Update a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientBody"
+      responses:
+        "200":
+          description: Updated client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+    delete:
+      operationId: deleteClient
+      tags: [clients]
+      summary: Delete a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Client deleted
+
+  /test-runs:
+    get:
+      operationId: listTestRuns
+      tags: [testRuns]
+      summary: List all test runs
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of test runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TestRun"
+    post:
+      operationId: createTestRun
+      tags: [testRuns]
+      summary: Trigger a test run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestRunBody"
+      responses:
+        "201":
+          description: Test run created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRun"
+
+  /test-runs/{id}:
+    get:
+      operationId: getTestRun
+      tags: [testRuns]
+      summary: Get a single test run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Test run details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestRun"
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [alerts]
+      summary: List recent alerts
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+    post:
+      operationId: createAlert
+      tags: [alerts]
+      summary: Create an alert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAlertBody"
+      responses:
+        "201":
+          description: Alert created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/resolve:
+    put:
+      operationId: resolveAlert
+      tags: [alerts]
+      summary: Resolve an alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Alert resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard aggregate metrics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/trend:
+    get:
+      operationId: getExecutionTrend
+      tags: [dashboard]
+      summary: Get test execution trend over time
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Execution trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendPoint"
+
+  /dashboard/failed-by-module:
+    get:
+      operationId: getFailedByModule
+      tags: [dashboard]
+      summary: Get failed test counts grouped by module
+      responses:
+        "200":
+          description: Failed by module
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModuleFailure"
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List historical reports
+      parameters:
+        - name: clientId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +319,247 @@ components:
       required:
         - status
 
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        environment:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, warning, error]
+        successRate:
+          type: number
+        lastRunAt:
+          type: string
+          nullable: true
+        webhookUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - environment
+        - status
+        - successRate
+        - createdAt
+
+    CreateClientBody:
+      type: object
+      properties:
+        name:
+          type: string
+        environment:
+          type: string
+        webhookUrl:
+          type: string
+          nullable: true
+      required:
+        - name
+        - environment
+
+    UpdateClientBody:
+      type: object
+      properties:
+        name:
+          type: string
+        environment:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, warning, error]
+        webhookUrl:
+          type: string
+          nullable: true
+
+    TestRun:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        clientName:
+          type: string
+        flow:
+          type: string
+        status:
+          type: string
+          enum: [running, passed, failed, skipped]
+        totalTests:
+          type: integer
+        passed:
+          type: integer
+        failed:
+          type: integer
+        skipped:
+          type: integer
+        duration:
+          type: integer
+          nullable: true
+        startedAt:
+          type: string
+        completedAt:
+          type: string
+          nullable: true
+      required:
+        - id
+        - clientId
+        - clientName
+        - flow
+        - status
+        - totalTests
+        - passed
+        - failed
+        - skipped
+        - startedAt
+
+    CreateTestRunBody:
+      type: object
+      properties:
+        clientId:
+          type: integer
+        flow:
+          type: string
+        webhookUrl:
+          type: string
+          nullable: true
+      required:
+        - clientId
+        - flow
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        clientName:
+          type: string
+        testRunId:
+          type: integer
+          nullable: true
+        severity:
+          type: string
+          enum: [critical, warning, info]
+        message:
+          type: string
+        module:
+          type: string
+          nullable: true
+        resolved:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - clientId
+        - clientName
+        - severity
+        - message
+        - resolved
+        - createdAt
+
+    CreateAlertBody:
+      type: object
+      properties:
+        clientId:
+          type: integer
+        testRunId:
+          type: integer
+          nullable: true
+        severity:
+          type: string
+          enum: [critical, warning, info]
+        message:
+          type: string
+        module:
+          type: string
+          nullable: true
+      required:
+        - clientId
+        - severity
+        - message
+
+    DashboardSummary:
+      type: object
+      properties:
+        successRate:
+          type: number
+        totalTests:
+          type: integer
+        failedTests:
+          type: integer
+        activeRuns:
+          type: integer
+        totalClients:
+          type: integer
+        unresolvedAlerts:
+          type: integer
+      required:
+        - successRate
+        - totalTests
+        - failedTests
+        - activeRuns
+        - totalClients
+        - unresolvedAlerts
+
+    TrendPoint:
+      type: object
+      properties:
+        date:
+          type: string
+        passed:
+          type: integer
+        failed:
+          type: integer
+        skipped:
+          type: integer
+      required:
+        - date
+        - passed
+        - failed
+        - skipped
+
+    ModuleFailure:
+      type: object
+      properties:
+        module:
+          type: string
+        count:
+          type: integer
+      required:
+        - module
+        - count
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        clientName:
+          type: string
+        period:
+          type: string
+        totalRuns:
+          type: integer
+        avgSuccessRate:
+          type: number
+        createdAt:
+          type: string
+      required:
+        - id
+        - clientId
+        - clientName
+        - period
+        - totalRuns
+        - avgSuccessRate
+        - createdAt

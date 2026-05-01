@@ -1,0 +1,45 @@
+# Role & Objective
+You are an expert Full-Stack Software Engineer and SaaS Architect. I am building a B2B Continuous QA Monitoring System called **"Assuredia"**. The core tagline is "Detect. Inform. Action."
+
+Your task is to build a professional SaaS platform (Frontend + Node.js Backend layer) that connects to my external QA execution engine running on an EC2 instance.
+
+# Tech Stack & Design Reference
+- **Frontend:** React, Next.js (App Router), Tailwind CSS, Lucide Icons, and Recharts (for data visualization).
+- **Backend:** Node.js (Next.js API Routes).
+- **Design System:** High-end professional SaaS look. Dark sidebar with a light main content area. The primary color scheme must use deep blue and teal (`#0B5ED7`, `#14B8A6`).
+
+# Pages to Build:
+1. **Landing Page:** Hero section (Tagline: Always On. Quality Assured.), feature highlights, and pricing.
+2. **Dashboard:** The central monitoring hub.
+3. **Clients Page:** A list of monitored clients with their current status.
+4. **Reports Page:** Historical test execution data and trends.
+5. **Settings Page:** Client configuration and notification preferences.
+
+# Dashboard Detailed Requirements:
+The Dashboard must include the following specific widgets:
+- **Top Metric Cards:** Success Rate (%), Total Tests, Failed Tests, and Active Runs.
+- **Charts:** 
+  - A Line Chart for "Test Execution Trend" (showing passed/failed/skipped over time).
+  - A Donut Chart for "Failed Tests by Module".
+- **Data Tables & Lists:**
+  - "Recent Test Runs" table.
+  - "Recent Alerts" sidebar or feed showing real-time issues.
+
+# External API Integration (Backend Boundaries):
+I have an external test execution engine running. Your Node.js backend/frontend needs to connect to these existing endpoints. 
+**Base API URL:** `http://YOUR_EC2_IP:8080`
+
+You will need to integrate the following external endpoints into the app's logic:
+- `GET /api/clients` - To list existing clients.
+- `POST /api/clients` - To add a new client.
+- `POST /api/run?client=X&flow=Y&webhookUrl=Z` - To trigger new test runs.
+- `GET /api/health` - To perform system health checks.
+
+# Step-by-Step Execution Plan for Replit Agent:
+1. Initialize the project with React/Next.js and Tailwind CSS.
+2. Scaffold the Main Layout (Dark Sidebar, Header, Page routing for Dashboard, Clients, Reports, Settings).
+3. Build the Dashboard UI using Recharts and mock data first to match the required visual aesthetics.
+4. Create utility functions to call the external EC2 APIs (`GET /api/clients`, `POST /api/run`, etc.).
+5. Replace the mock data in the Dashboard and Clients page with the real data fetched from the external APIs.
+
+Do not write everything at once. Start with Steps 1 and 2, show me the layout, and wait for my approval before building the complex charts and API integrations.
