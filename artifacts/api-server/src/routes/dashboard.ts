@@ -1,35 +1,44 @@
 import { Router } from "express";
-import { db, testRunsTable, clientsTable, alertsTable } from "@workspace/db";
-import { eq, count, sum, avg, gte, sql } from "drizzle-orm";
+import { db, testRuns, clients, testFailures } from "@workspace/db";
+import { eq, count, sum, gte, sql } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/dashboard/summary", async (req, res) => {
   try {
-    const [clientStats] = await db.select({ total: count() }).from(clientsTable);
-    const [runStats] = await db.select({
-      totalTests: sum(testRunsTable.totalTests),
-      failedTests: sum(testRunsTable.failed),
-      avgRate: avg(clientsTable.successRate),
-    }).from(testRunsTable).leftJoin(clientsTable, eq(testRunsTable.clientId, clientsTable.id));
+    const [clientStats] = await db.select({ total: count() }).from(clients);
+    const [runStats] = await db
+      .select({
+        totalTests: sum(testRuns.total),
+        failedTests: sum(testRuns.failed),
+      })
+      .from(testRuns)
+      .leftJoin(clients, eq(testRuns.clientId, clients.id));
 
-    const [activeRuns] = await db.select({ count: count() }).from(testRunsTable)
-      .where(eq(testRunsTable.status, "running"));
+    const [activeRuns] = await db
+      .select({ cnt: count() })
+      .from(testRuns)
+      .where(eq(testRuns.status, "running"));
 
-    const [unresolvedAlerts] = await db.select({ count: count() }).from(alertsTable)
-      .where(eq(alertsTable.resolved, false));
+    const [unresolvedAlerts] = await db
+      .select({ cnt: count() })
+      .from(testFailures);
 
     const totalTests = Number(runStats?.totalTests ?? 0);
     const failedTests = Number(runStats?.failedTests ?? 0);
-    const successRate = totalTests > 0 ? Math.round(((totalTests - failedTests) / totalTests) * 100 * 10) / 10 : 100;
+    const successRate =
+      totalTests > 0
+        ? Math.round(((totalTests - failedTests) / totalTests) * 100 * 10) /
+          10
+        : 100;
 
     res.json({
       successRate,
       totalTests,
       failedTests,
-      activeRuns: Number(activeRuns?.count ?? 0),
+      activeRuns: Number(activeRuns?.cnt ?? 0),
       totalClients: Number(clientStats?.total ?? 0),
-      unresolvedAlerts: Number(unresolvedAlerts?.count ?? 0),
+      unresolvedAlerts: Number(unresolvedAlerts?.cnt ?? 0),
     });
   } catch (err) {
     req.log.error({ err }, "Failed to get dashboard summary");
@@ -45,15 +54,15 @@ router.get("/dashboard/trend", async (req, res) => {
 
     const rows = await db
       .select({
-        date: sql<string>`DATE(${testRunsTable.startedAt})::text`,
-        passed: sum(testRunsTable.passed),
-        failed: sum(testRunsTable.failed),
-        skipped: sum(testRunsTable.skipped),
+        date: sql<string>`DATE(${testRuns.timestamp})::text`,
+        passed: sum(testRuns.passed),
+        failed: sum(testRuns.failed),
+        skipped: sum(testRuns.skipped),
       })
-      .from(testRunsTable)
-      .where(gte(testRunsTable.startedAt, since))
-      .groupBy(sql`DATE(${testRunsTable.startedAt})`)
-      .orderBy(sql`DATE(${testRunsTable.startedAt})`);
+      .from(testRuns)
+      .where(gte(testRuns.timestamp, since))
+      .groupBy(sql`DATE(${testRuns.timestamp})`)
+      .orderBy(sql`DATE(${testRuns.timestamp})`);
 
     const dateMap: Record<string, { passed: number; failed: number; skipped: number }> = {};
     for (const row of rows) {
@@ -86,19 +95,20 @@ router.get("/dashboard/failed-by-module", async (req, res) => {
   try {
     const rows = await db
       .select({
-        module: alertsTable.module,
+        module: testFailures.testName,
         count: count(),
       })
-      .from(alertsTable)
-      .where(sql`${alertsTable.module} IS NOT NULL`)
-      .groupBy(alertsTable.module)
+      .from(testFailures)
+      .groupBy(testFailures.testName)
       .orderBy(sql`count(*) DESC`)
       .limit(8);
 
-    res.json(rows.map(r => ({
-      module: r.module ?? "Unknown",
-      count: Number(r.count),
-    })));
+    res.json(
+      rows.map((r) => ({
+        module: r.module ?? "Unknown",
+        count: Number(r.count),
+      })),
+    );
   } catch (err) {
     req.log.error({ err }, "Failed to get failed by module");
     res.status(500).json({ error: "Internal server error" });

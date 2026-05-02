@@ -18,7 +18,7 @@ const navItems = [
 export function Sidebar() {
   const [location] = useLocation();
   const { data: alerts } = useListAlerts({ limit: 50 });
-  const openAlerts = alerts?.filter((a) => a.status === "open").length ?? 0;
+  const openAlerts = alerts?.filter((a) => !a.resolved).length ?? 0;
 
   return (
     <aside className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border hidden md:flex flex-col h-screen fixed top-0 left-0">

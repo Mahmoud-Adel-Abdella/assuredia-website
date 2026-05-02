@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { db, alertsTable, clientsTable } from "@workspace/db";
+import {
+  db,
+  testFailures,
+  testRuns,
+  clients,
+} from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { z } from "zod";
 
@@ -7,28 +12,45 @@ const router = Router();
 
 router.get("/alerts", async (req, res) => {
   try {
-    const clientId = req.query.clientId ? parseInt(req.query.clientId as string) : undefined;
+    const clientId = req.query.clientId
+      ? parseInt(req.query.clientId as string)
+      : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 
-    const alerts = await db
-      .select({ alert: alertsTable, clientName: clientsTable.name })
-      .from(alertsTable)
-      .innerJoin(clientsTable, eq(alertsTable.clientId, clientsTable.id))
-      .where(clientId ? eq(alertsTable.clientId, clientId) : undefined)
-      .orderBy(desc(alertsTable.createdAt))
+    const rows = await db
+      .select({
+        failure: testFailures,
+        clientName: clients.clientName,
+        clientId: clients.id,
+        testRunId: testRuns.id,
+        runTs: testRuns.timestamp,
+      })
+      .from(testFailures)
+      .innerJoin(testRuns, eq(testFailures.runId, testRuns.id))
+      .innerJoin(clients, eq(testRuns.clientId, clients.id))
+      .where(clientId ? eq(clients.id, clientId) : undefined)
+      .orderBy(desc(testRuns.timestamp))
       .limit(limit);
 
-    res.json(alerts.map(({ alert, clientName }) => ({
-      id: alert.id,
-      clientId: alert.clientId,
-      clientName,
-      testRunId: alert.testRunId ?? null,
-      severity: alert.severity,
-      message: alert.message,
-      module: alert.module ?? null,
-      resolved: alert.resolved,
-      createdAt: alert.createdAt.toISOString(),
-    })));
+    const severityFor = (message: string | null) => {
+      const m = (message ?? "").toLowerCase();
+      if (m.includes("timeout") || m.includes("crash")) return "critical" as const;
+      return "warning" as const;
+    };
+
+    res.json(
+      rows.map(({ failure, clientName, clientId, testRunId, runTs }) => ({
+        id: failure.id,
+        clientId,
+        clientName,
+        testRunId,
+        severity: severityFor(failure.errorMessage),
+        message: failure.errorMessage ?? failure.testName,
+        module: failure.testName,
+        resolved: false,
+        createdAt: (runTs ?? new Date()).toISOString(),
+      })),
+    );
   } catch (err) {
     req.log.error({ err }, "Failed to list alerts");
     res.status(500).json({ error: "Internal server error" });
@@ -45,59 +67,48 @@ const createAlertSchema = z.object({
 
 router.post("/alerts", async (req, res) => {
   const parsed = createAlertSchema.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: "Invalid request body" }); return; }
-  try {
-    const [client] = await db.select().from(clientsTable).where(eq(clientsTable.id, parsed.data.clientId));
-    if (!client) { res.status(404).json({ error: "Client not found" }); return; }
-
-    const [alert] = await db.insert(alertsTable).values({
-      clientId: parsed.data.clientId,
-      testRunId: parsed.data.testRunId ?? null,
-      severity: parsed.data.severity,
-      message: parsed.data.message,
-      module: parsed.data.module ?? null,
-      resolved: false,
-    }).returning();
-
-    res.status(201).json({
-      id: alert.id,
-      clientId: alert.clientId,
-      clientName: client.name,
-      testRunId: alert.testRunId ?? null,
-      severity: alert.severity,
-      message: alert.message,
-      module: alert.module ?? null,
-      resolved: alert.resolved,
-      createdAt: alert.createdAt.toISOString(),
-    });
-  } catch (err) {
-    req.log.error({ err }, "Failed to create alert");
-    res.status(500).json({ error: "Internal server error" });
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid request body" });
+    return;
   }
+  res.status(501).json({
+    error: "Manual alert creation is not supported; alerts are derived from test failures.",
+  });
 });
 
 router.put("/alerts/:id/resolve", async (req, res) => {
   const id = parseInt(req.params.id);
-  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
   try {
-    const [result] = await db
-      .select({ alert: alertsTable, clientName: clientsTable.name })
-      .from(alertsTable)
-      .innerJoin(clientsTable, eq(alertsTable.clientId, clientsTable.id))
-      .where(eq(alertsTable.id, id));
-    if (!result) { res.status(404).json({ error: "Not found" }); return; }
-
-    const [alert] = await db.update(alertsTable).set({ resolved: true }).where(eq(alertsTable.id, id)).returning();
+    const [row] = await db
+      .select({
+        failure: testFailures,
+        clientId: clients.id,
+        clientName: clients.clientName,
+        runTs: testRuns.timestamp,
+      })
+      .from(testFailures)
+      .innerJoin(testRuns, eq(testFailures.runId, testRuns.id))
+      .innerJoin(clients, eq(testRuns.clientId, clients.id))
+      .where(eq(testFailures.id, id));
+    if (!row) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    await db.delete(testFailures).where(eq(testFailures.id, id));
     res.json({
-      id: alert.id,
-      clientId: alert.clientId,
-      clientName: result.clientName,
-      testRunId: alert.testRunId ?? null,
-      severity: alert.severity,
-      message: alert.message,
-      module: alert.module ?? null,
-      resolved: alert.resolved,
-      createdAt: alert.createdAt.toISOString(),
+      id: row.failure.id,
+      clientId: row.clientId,
+      clientName: row.clientName,
+      testRunId: row.failure.runId,
+      severity: "info" as const,
+      message: row.failure.errorMessage ?? row.failure.testName,
+      module: row.failure.testName,
+      resolved: true,
+      createdAt: (row.runTs ?? new Date()).toISOString(),
     });
   } catch (err) {
     req.log.error({ err }, "Failed to resolve alert");

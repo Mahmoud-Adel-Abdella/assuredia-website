@@ -185,10 +185,11 @@ export default function Alerts() {
                 {filtered?.map((alert) => {
                   const config = SEVERITY_CONFIG[alert.severity as keyof typeof SEVERITY_CONFIG] ?? SEVERITY_CONFIG.info;
                   const Icon = config.icon;
+                  const statusLabel = alert.resolved ? "resolved" : "open";
                   return (
                     <div
                       key={alert.id}
-                      className={`px-6 py-4 flex items-start gap-4 hover:bg-muted/20 transition-colors ${alert.status === "open" ? config.bg : ""}`}
+                      className={`px-6 py-4 flex items-start gap-4 hover:bg-muted/20 transition-colors ${statusLabel === "open" ? config.bg : ""}`}
                     >
                       <div className={`mt-0.5 flex-shrink-0 rounded-full p-2 ${config.badge}`}>
                         <Icon className="h-4 w-4" />
@@ -207,12 +208,12 @@ export default function Alerts() {
                       <Badge
                         variant="outline"
                         className={`flex-shrink-0 capitalize text-xs ${
-                          alert.status === "open"
+                          statusLabel === "open"
                             ? "bg-destructive/10 text-destructive border-destructive/20"
                             : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                         }`}
                       >
-                        {alert.status}
+                        {statusLabel}
                       </Badge>
                     </div>
                   );
