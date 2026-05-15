@@ -44,7 +44,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {loadingSummary ? <Skeleton className="h-9 w-24" /> : (
-                <div className="text-3xl font-bold text-foreground">{summary?.successRate.toFixed(1)}%</div>
+                <div className="text-3xl font-bold text-foreground">{(summary?.successRate ?? 0).toFixed(1)}%</div>
               )}
               <div className="flex items-center gap-1 mt-1 text-xs text-emerald-600">
                 <TrendingUp className="h-3 w-3" />
@@ -63,7 +63,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {loadingSummary ? <Skeleton className="h-9 w-24" /> : (
-                <div className="text-3xl font-bold text-foreground">{summary?.totalTests.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-foreground">{(summary?.totalTests ?? 0).toLocaleString()}</div>
               )}
               <p className="text-xs text-muted-foreground mt-1">Executed this month</p>
             </CardContent>
@@ -79,7 +79,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {loadingSummary ? <Skeleton className="h-9 w-24" /> : (
-                <div className="text-3xl font-bold text-foreground">{summary?.failedTests.toLocaleString()}</div>
+                <div className="text-3xl font-bold text-foreground">{(summary?.failedTests ?? 0).toLocaleString()}</div>
               )}
               <p className="text-xs text-destructive/80 mt-1">Requires attention</p>
             </CardContent>
@@ -95,7 +95,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {loadingSummary ? <Skeleton className="h-9 w-24" /> : (
-                <div className="text-3xl font-bold text-foreground">{summary?.activeRuns}</div>
+                <div className="text-3xl font-bold text-foreground">{summary?.activeRuns ?? 0}</div>
               )}
               <p className="text-xs text-muted-foreground mt-1">Currently executing</p>
             </CardContent>
@@ -113,7 +113,7 @@ export default function Dashboard() {
               <div className="h-[300px] w-full">
                 {loadingTrend ? <Skeleton className="h-full w-full" /> : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={trendData || []} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <LineChart data={Array.isArray(trendData) ? trendData : []} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                       <XAxis
                         dataKey="date"
@@ -162,7 +162,7 @@ export default function Dashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={failedByModule || []}
+                        data={Array.isArray(failedByModule) ? failedByModule : []}
                         cx="50%"
                         cy="45%"
                         innerRadius={62}
@@ -171,7 +171,7 @@ export default function Dashboard() {
                         dataKey="count"
                         nameKey="module"
                       >
-                        {(failedByModule || []).map((_, index) => (
+                        {(Array.isArray(failedByModule) ? failedByModule : []).map((_, index) => (
                           <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                         ))}
                       </Pie>
@@ -234,14 +234,14 @@ export default function Dashboard() {
                           <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
                         </tr>
                       ))
-                    ) : recentRuns?.length === 0 ? (
+                    ) : !Array.isArray(recentRuns) || recentRuns.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                           No recent runs found.
                         </td>
                       </tr>
                     ) : (
-                      recentRuns?.map((run) => (
+                      (recentRuns as typeof recentRuns & any[]).map((run) => (
                         <tr key={run.id} className="hover:bg-muted/30 transition-colors">
                           <td className="px-4 py-3 font-medium text-foreground">{run.clientName}</td>
                           <td className="px-4 py-3 text-muted-foreground text-xs">{run.flow}</td>
@@ -298,13 +298,13 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ))
-                ) : recentAlerts?.length === 0 ? (
+                ) : !Array.isArray(recentAlerts) || recentAlerts.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground flex flex-col items-center justify-center">
                     <CheckCircle2 className="h-10 w-10 text-emerald-500/50 mb-3" />
                     <p className="text-sm">No active alerts!</p>
                   </div>
                 ) : (
-                  recentAlerts?.map((alert) => (
+                  (recentAlerts as typeof recentAlerts & any[]).map((alert) => (
                     <div key={alert.id} className="flex gap-3 group">
                       <div className={`mt-0.5 flex-shrink-0 rounded-full p-1.5 ${
                         alert.severity === 'critical' ? 'bg-destructive/10 text-destructive' :

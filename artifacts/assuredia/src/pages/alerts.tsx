@@ -41,14 +41,15 @@ export default function Alerts() {
     limit: 50,
   });
 
-  const filtered = alerts?.filter((a) =>
+  const alertsArray = Array.isArray(alerts) ? alerts : [];
+  const filtered = alertsArray.filter((a) =>
     severity === "all" ? true : a.severity === severity
   );
 
   const counts = {
-    critical: alerts?.filter((a) => a.severity === "critical").length ?? 0,
-    warning: alerts?.filter((a) => a.severity === "warning").length ?? 0,
-    info: alerts?.filter((a) => a.severity === "info").length ?? 0,
+    critical: alertsArray.filter((a) => a.severity === "critical").length,
+    warning: alertsArray.filter((a) => a.severity === "warning").length,
+    info: alertsArray.filter((a) => a.severity === "info").length,
   };
 
   return (
@@ -126,7 +127,7 @@ export default function Alerts() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Clients</SelectItem>
-              {clients?.map((c) => (
+              {Array.isArray(clients) && clients.map((c) => (
                 <SelectItem key={c.id} value={c.id.toString()}>
                   {c.name}
                 </SelectItem>

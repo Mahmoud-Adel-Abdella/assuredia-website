@@ -2,7 +2,8 @@ import { Link, useLocation } from "wouter";
 import { LayoutDashboard, Users, FileBarChart, Settings, Bell, Search, Menu, Sun, Moon, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import logoUrl from "@assets/e2a4684a-979c-4de9-be72-c3624b6dcb8c_1777651437482.png";
+import logoLightUrl from "@assets/logo-light.jpg";
+import logoDarkUrl from "@assets/logo-dark.png";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppTheme } from "@/context/ThemeContext";
 import { useListAlerts } from "@workspace/api-client-react";
@@ -18,13 +19,13 @@ const navItems = [
 export function Sidebar() {
   const [location] = useLocation();
   const { data: alerts } = useListAlerts({ limit: 50 });
-  const openAlerts = alerts?.filter((a) => !a.resolved).length ?? 0;
+  const openAlerts = Array.isArray(alerts) ? alerts.filter((a) => !a.resolved).length : 0;
 
   return (
     <aside className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border hidden md:flex flex-col h-screen fixed top-0 left-0">
       <div className="p-6 h-16 flex items-center border-b border-sidebar-border">
         <Link href="/" className="flex items-center gap-3">
-          <img src={logoUrl} alt="Assuredia" className="h-8 w-auto object-contain brightness-0 invert" />
+          <img src={logoDarkUrl} alt="Assuredia" className="h-10 w-auto object-contain" />
           <span className="font-bold text-lg tracking-tight">Assuredia</span>
         </Link>
       </div>
@@ -84,7 +85,7 @@ export function Header() {
           <Menu className="h-5 w-5" />
         </Button>
         <Link href="/" className="flex items-center gap-2">
-          <img src={logoUrl} alt="Assuredia" className="h-6 w-auto" />
+          <img src={theme === 'dark' ? logoDarkUrl : logoLightUrl} alt="Assuredia" className="h-8 w-auto" />
         </Link>
       </div>
 

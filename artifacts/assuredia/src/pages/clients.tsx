@@ -26,10 +26,12 @@ export default function Clients() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: clients, isLoading } = useListClients();
   
-  const filteredClients = clients?.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.environment.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClients = Array.isArray(clients)
+    ? clients.filter(c => 
+        c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        c.environment?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <AppLayout>
@@ -80,14 +82,14 @@ export default function Clients() {
                         <td className="px-6 py-4"><Skeleton className="h-8 w-24 ml-auto" /></td>
                       </tr>
                     ))
-                  ) : filteredClients?.length === 0 ? (
+                  ) : filteredClients.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                         No clients found matching your search.
                       </td>
                     </tr>
                   ) : (
-                    filteredClients?.map((client) => (
+                    filteredClients.map((client) => (
                       <tr key={client.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-foreground">
                           {client.name}

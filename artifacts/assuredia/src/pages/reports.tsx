@@ -32,7 +32,7 @@ export default function Reports() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Clients</SelectItem>
-                {clients?.map(client => (
+                {Array.isArray(clients) && clients.map(client => (
                   <SelectItem key={client.id} value={client.id.toString()}>
                     {client.name}
                   </SelectItem>
@@ -62,14 +62,14 @@ export default function Reports() {
                 </CardContent>
               </Card>
             ))
-          ) : reports?.length === 0 ? (
+          ) : !Array.isArray(reports) || reports.length === 0 ? (
             <Card className="flex flex-col items-center justify-center py-16 text-center">
               <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-medium">No reports generated</h3>
               <p className="text-muted-foreground">Reports are automatically generated at the end of each billing cycle or month.</p>
             </Card>
           ) : (
-            reports?.map((report) => (
+            reports.map((report) => (
               <Card key={report.id}>
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                   <div>

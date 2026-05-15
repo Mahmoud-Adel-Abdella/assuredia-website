@@ -1,559 +1,575 @@
-import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, ChevronDown, Play, Sun, Moon, Monitor, Bell, CheckCircle2, Activity, Brain, Cloud, Send, TrendingUp } from "lucide-react";
-import logoUrl from "@assets/e2a4684a-979c-4de9-be72-c3624b6dcb8c_1777651437482.png";
+import {
+  Activity,
+  ArrowRight,
+  Bell,
+  BrainCircuit,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Cloud,
+  ImageIcon,
+  LineChart,
+  Moon,
+  Play,
+  Send,
+  Sun,
+} from "lucide-react";
+import { useAppTheme } from "@/context/ThemeContext";
+import logoTransparentUrl from "@assets/assuredia-logo-transparent.svg";
 
-function useTheme() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("lp-theme") as "light" | "dark") || "light";
-    }
-    return "light";
-  });
+const navItems = [
+  { label: "Product", href: "#product", dropdown: true },
+  { label: "Features", href: "#features" },
+  { label: "Solutions", href: "#solutions", dropdown: true },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Resources", href: "#resources", dropdown: true },
+  { label: "About", href: "#about" },
+];
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("lp-theme", theme);
-  }, [theme]);
+const features = [
+  {
+    icon: BrainCircuit,
+    title: "AI-Powered Insights",
+    description:
+      "Smart analysis and self-healing capabilities to keep your tests resilient and up to date.",
+  },
+  {
+    icon: LineChart,
+    title: "24/7 Monitoring",
+    description:
+      "Round-the-clock monitoring across all environments to ensure system stability.",
+  },
+  {
+    icon: Send,
+    title: "Instant Notifications",
+    description:
+      "Real-time alerts via Telegram with rich details and screenshots for faster response.",
+  },
+  {
+    icon: Cloud,
+    title: "Scalable & Reliable",
+    description:
+      "Built with Docker and AWS for high availability, scalability, and performance.",
+  },
+];
 
-  return { theme, toggle: () => setTheme(t => t === "light" ? "dark" : "light") };
-}
+const technologies = [
+  { label: "Java", mark: "J", color: "#f06b22" },
+  { label: "Selenium", mark: "Se", color: "#39b54a" },
+  { label: "Assured", mark: "REST", color: "#0b1746" },
+  { label: "n8n", mark: "n8n", color: "#ea4b71" },
+  { label: "AWS", mark: "aws", color: "#ff9900" },
+  { label: "Docker", mark: "D", color: "#2496ed" },
+  { label: "AI Integration", mark: "AI", color: "#315bff" },
+];
 
-function NavDropdown({ label }: { label: string }) {
+function NavLink({ item }: { item: (typeof navItems)[number] }) {
   return (
-    <button className="flex items-center gap-1 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B5ED7] dark:hover:text-[#14B8A6] transition-colors">
-      {label}
-      <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-    </button>
+    <a
+      href={item.href}
+      className="flex items-center gap-1.5 text-[15px] font-semibold text-[#06185a] transition hover:text-[#095ee8] dark:text-white/90 dark:hover:text-[#20d6c1]"
+    >
+      {item.label}
+      {item.dropdown ? <ChevronDown className="h-4 w-4" /> : null}
+    </a>
   );
 }
 
-function ProcessCard({ step, title, desc, children, active }: {
-  step: string; title: string; desc: string; children: React.ReactNode; active?: boolean;
-}) {
+function Brand() {
   return (
-    <div className={`relative flex flex-col p-3.5 rounded-xl border text-center w-[140px] shrink-0 shadow-sm transition-all
-      ${active
-        ? "bg-white dark:bg-[#0d1b3e] border-[#3b82f6]/40 dark:border-[#3b82f6]/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-        : "bg-white dark:bg-[#111c3a] border-slate-200/80 dark:border-slate-700/50"
-      }`}>
-      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1">{step}</p>
-      <p className="text-[11px] font-bold text-slate-800 dark:text-white mb-0.5">{title}</p>
-      <p className="text-[9px] text-slate-400 dark:text-slate-500 leading-tight mb-2.5">{desc}</p>
-      <div className="flex items-center justify-center h-16">{children}</div>
+    <a href="#product" className="flex shrink-0 items-center gap-3">
+      <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center" aria-hidden="true">
+        <img
+          src={logoTransparentUrl}
+          alt=""
+          className="h-full w-full object-contain"
+          style={{ imageRendering: "auto" }}
+          draggable={false}
+        />
+      </span>
+      <span className="hidden leading-none min-[560px]:block">
+        <span className="block text-[22px] font-extrabold tracking-[0.10em] text-[#06185a] dark:text-white">
+          ASSURE<span className="text-[#12b9aa]">DIA</span>
+        </span>
+        <span className="mt-0.5 block text-center text-[10px] font-semibold tracking-[0.06em] text-[#3d4f7c] dark:text-white/60">
+          Detect. <span className="text-[#0c56d9] dark:text-[#4a8af5]">|</span> Inform. <span className="text-[#0c56d9] dark:text-[#4a8af5]">|</span> Act.
+        </span>
+      </span>
+    </a>
+  );
+}
+
+function BrowserTile({ variant = "test" }: { variant?: "test" | "action" }) {
+  return (
+    <div className="relative h-[88px] w-[110px] rounded-[8px] border border-[#b4c8e4] bg-gradient-to-b from-white to-[#f7faff] shadow-[0_1px_2px_rgba(0,0,0,0.06),0_4px_12px_rgba(37,99,235,0.10),0_12px_24px_rgba(14,38,92,0.06)] dark:border-white/10 dark:bg-[#0b1a34] dark:from-[#0b1a34] dark:to-[#0b1a34] dark:shadow-[0_8px_20px_rgba(0,0,0,0.25)]">
+      <div className="flex h-[18px] items-center gap-[5px] rounded-t-[8px] bg-gradient-to-r from-[#4a6ec5] to-[#3b5eb3] px-3 dark:from-[#2d4e9a] dark:to-[#365cad]">
+        <span className="h-[5px] w-[5px] rounded-full bg-white/80" />
+        <span className="h-[5px] w-[5px] rounded-full bg-white/80" />
+        <span className="h-[5px] w-[5px] rounded-full bg-white/80" />
+      </div>
+      <div className="space-y-[6px] px-3 py-3">
+        <span className="block h-[5px] w-full rounded-full bg-[#dae3f1] dark:bg-white/10" />
+        <span className="block h-[5px] w-3/4 rounded-full bg-[#dae3f1] dark:bg-white/10" />
+        {variant === "test" ? (
+          <span className="block h-[5px] w-1/2 rounded-full bg-[#dae3f1] dark:bg-white/10" />
+        ) : null}
+      </div>
+      <div className="absolute -bottom-[6px] -right-[6px] flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#14d4c6] to-[#0fa89b] text-white shadow-[0_2px_6px_rgba(20,184,166,0.35),0_6px_16px_rgba(20,184,166,0.20)]">
+        <Check className="h-3.5 w-3.5 stroke-[3]" />
+      </div>
     </div>
   );
 }
 
-function BrowserMockup() {
+function StepCard({
+  number,
+  title,
+  description,
+  children,
+  className = "",
+}: {
+  number: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="w-full rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600/50 shadow-sm bg-white dark:bg-slate-800">
-      <div className="flex items-center gap-1 px-2 py-1.5 bg-slate-100 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
-        <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-        <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-        <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+    <article
+      className={`group relative z-10 flex min-h-[260px] shrink-0 flex-col rounded-[14px] border border-[#cad6ea] bg-gradient-to-b from-white to-[#f6f9ff] p-6 shadow-[0_0_0_1px_rgba(14,38,92,0.03),0_1px_3px_rgba(0,0,0,0.05),0_6px_16px_rgba(14,38,92,0.07),0_20px_44px_rgba(14,38,92,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(14,38,92,0.04),0_2px_4px_rgba(0,0,0,0.06),0_10px_24px_rgba(14,38,92,0.09),0_28px_56px_rgba(14,38,92,0.08)] dark:border-white/[0.08] dark:bg-[#0a1428]/90 dark:from-[#0a1428]/90 dark:to-[#0a1428]/90 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_12px_32px_rgba(0,0,0,0.3)] ${className}`}
+    >
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px] bg-gradient-to-br from-[#12b9aa] to-[#0ea396] text-[12px] font-bold text-white shadow-[0_2px_6px_rgba(18,185,170,0.30),0_6px_16px_rgba(18,185,170,0.15)]">
+          {number}
+        </span>
+        <h3 className="text-[15px] font-bold tracking-[-0.01em] text-[#051340] dark:text-white">
+          {title}
+        </h3>
       </div>
-      <div className="p-2 space-y-1">
-        <div className="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-3/4" />
-        <div className="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-1/2" />
-        <div className="h-1.5 bg-slate-200 dark:bg-slate-600 rounded w-2/3" />
+      <p className="mt-3 text-[12px] font-medium leading-[1.6] text-[#3a4d78] dark:text-white/70">
+        {description}
+      </p>
+      <div className="mt-auto flex justify-center pt-5">{children}</div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 rounded-b-[14px] bg-gradient-to-t from-[#e8f0fd]/70 via-[#f0f6ff]/30 to-transparent dark:from-[#0d1e3d]/40 dark:via-transparent" />
+    </article>
+  );
+}
+
+/* CSS-in-JS style for the animated connector */
+const connectorKeyframes = `
+@keyframes flowDot {
+  0% { transform: translateX(0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes detectPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(49,91,255,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(49,91,255,0); }
+}
+`;
+
+function ConnectorArrow() {
+  return (
+    <div className="absolute top-1/2 -translate-y-1/2 flex items-center" style={{ left: "calc(100% - 2px)", width: "calc(var(--gap, 20px) + 4px)", zIndex: 5 }}>
+      <div className="relative h-[1px] w-full">
+        <div className="absolute inset-0 border-t-[2px] border-dashed border-[#94b0d8] dark:border-white/15" />
+        <div
+          className="absolute top-[-3px] h-[7px] w-[7px] rounded-full bg-[#12b9aa] shadow-[0_0_6px_rgba(18,185,170,0.5)]"
+          style={{ animation: "flowDot 2.2s ease-in-out infinite" }}
+        />
       </div>
-      <div className="absolute bottom-1 right-1">
-        <div className="w-5 h-5 rounded-full bg-[#14B8A6] flex items-center justify-center shadow">
-          <CheckCircle2 className="w-3 h-3 text-white" />
+      <svg className="absolute -right-[5px] top-1/2 -translate-y-1/2 h-[8px] w-[6px] text-[#7a9ac4] dark:text-white/20" viewBox="0 0 6 8" fill="currentColor">
+        <path d="M0 0L6 4L0 8Z" />
+      </svg>
+    </div>
+  );
+}
+
+function ProcessFlow() {
+  return (
+    <div className="relative mx-auto flex w-full max-w-[780px] items-center justify-center overflow-visible">
+      <style>{connectorKeyframes}</style>
+      <div className="grid w-full grid-cols-4 items-stretch gap-4" style={{ "--gap": "16px" } as React.CSSProperties}>
+        {/* Step 1: Test */}
+        <div className="relative">
+          <StepCard number="1" title="Test" description="Automated UI & API tests run 24/7">
+            <BrowserTile />
+          </StepCard>
+          <ConnectorArrow />
+        </div>
+
+        {/* Step 2: Detect */}
+        <div className="relative">
+          <StepCard number="2" title="Detect" description="Issues detected in real-time">
+            <div className="relative mx-auto flex h-[100px] w-[100px] items-center justify-center">
+              <span className="absolute h-[100px] w-[100px] rounded-full border border-[#0d5dff]/15 dark:border-[#0d5dff]/10" />
+              <span className="absolute h-[80px] w-[80px] rounded-full border border-[#0d5dff]/20 dark:border-[#0d5dff]/15" />
+              <span className="absolute h-[60px] w-[60px] rounded-full border border-[#0d5dff]/30 bg-[#0d5dff]/[0.06] dark:bg-[#0d5dff]/[0.08]" />
+              <span
+                className="absolute h-[44px] w-[44px] rounded-full bg-gradient-to-br from-[#3b6aff] to-[#2448cc] shadow-[0_0_24px_rgba(49,91,255,0.45)]"
+                style={{ animation: "detectPulse 2.5s ease-in-out infinite" }}
+              />
+              <span className="relative text-[26px] font-extrabold leading-none text-white">!</span>
+            </div>
+          </StepCard>
+          <ConnectorArrow />
+        </div>
+
+        {/* Step 3: Inform */}
+        <div className="relative">
+          <StepCard number="3" title="Inform" description="Instant alerts with rich context" className="overflow-hidden">
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[#eef3fc] dark:bg-[#111f3d]">
+                <Bell className="h-[32px] w-[32px] fill-[#315bff] stroke-[#315bff]" />
+                <span className="absolute -right-1 top-0 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#ff3f54] text-[11px] font-bold text-white shadow-[0_2px_8px_rgba(255,63,84,0.35)]">
+                  1
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-gradient-to-br from-[#1490ff] to-[#0c6fdf] text-white shadow-[0_4px_12px_rgba(12,141,255,0.25)]">
+                  <Send className="h-3.5 w-3.5 fill-white/30" />
+                </span>
+                <span className="text-base font-light text-[#9babc4] dark:text-white/40">+</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-[8px] border border-[#12b9aa]/50 bg-[#12b9aa]/[0.06] text-[#12b9aa]">
+                  <ImageIcon className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </div>
+          </StepCard>
+          <ConnectorArrow />
+        </div>
+
+        {/* Step 4: Action */}
+        <div className="relative">
+          <StepCard number="4" title="Action" description="Resolve faster with insights & automation">
+            <BrowserTile variant="action" />
+          </StepCard>
         </div>
       </div>
     </div>
   );
 }
 
-function DashedArrow({ direction = "right" }: { direction?: "right" | "up" | "down" | "left" }) {
-  const svgProps = direction === "right" || direction === "left"
-    ? { width: 32, height: 16 }
-    : { width: 16, height: 32 };
-
-  const path = direction === "right"
-    ? "M2 8 H30 M24 4 L30 8 L24 12"
-    : direction === "left"
-    ? "M30 8 H2 M8 4 L2 8 L8 12"
-    : direction === "down"
-    ? "M8 2 V30 M4 24 L8 30 L12 24"
-    : "M8 30 V2 M4 8 L8 2 L12 8";
-
+function StatusBar() {
   return (
-    <svg width={svgProps.width} height={svgProps.height} viewBox={`0 0 ${svgProps.width} ${svgProps.height}`} fill="none">
-      <path d={path} stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="3 2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className="mx-auto mt-5 flex h-[52px] w-full max-w-[700px] items-center justify-between gap-5 rounded-[12px] border border-[#c4d3ea] bg-gradient-to-b from-white/95 to-[#f4f8ff]/95 px-6 text-[#06185a] shadow-[0_0_0_1px_rgba(14,38,92,0.03),0_1px_3px_rgba(0,0,0,0.04),0_6px_16px_rgba(14,38,92,0.06),0_16px_36px_rgba(14,38,92,0.05)] backdrop-blur-xl dark:border-white/[0.08] dark:bg-[#0b1427]/80 dark:from-[#0b1427]/80 dark:to-[#0b1427]/80 dark:text-white/90 dark:shadow-[0_8px_24px_rgba(0,0,0,0.2)]">
+      <div className="flex items-center gap-2.5">
+        <span className="relative flex h-[10px] w-[10px]">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#12b9aa] opacity-40" />
+          <span className="relative inline-flex h-[10px] w-[10px] rounded-full bg-[#12b9aa] shadow-[0_0_8px_rgba(18,185,170,0.5)]" />
+        </span>
+        <span className="text-[13px] font-semibold text-[#2c3e64] dark:text-white/70">System Status</span>
+      </div>
+      <span className="h-5 w-px bg-[#c4d3ea] dark:bg-white/10" />
+      <span className="text-[13px] font-semibold text-[#00957f]">All Systems Operational</span>
+      <span className="h-5 w-px bg-[#c4d3ea] dark:bg-white/10" />
+      <Activity className="h-5 w-16 stroke-[#12b9aa]" strokeWidth={1.5} />
+      <span className="h-5 w-px bg-[#c4d3ea] dark:bg-white/10" />
+      <span className="text-[13px] font-semibold tracking-[-0.01em]">
+        <span className="text-[#08bfa9]">99.98%</span>
+        <span className="ml-1 font-medium text-[#4a6185] dark:text-white/60">Uptime</span>
+      </span>
+    </div>
   );
 }
 
-function UptimeLine() {
+function HeroBackground() {
   return (
-    <svg width="80" height="20" viewBox="0 0 80 20" fill="none">
-      <path d="M0 14 L10 14 L15 6 L20 16 L25 10 L30 14 L40 14 L45 8 L50 14 L60 14 L65 5 L70 14 L80 14"
-        stroke="#14B8A6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div className="absolute left-0 top-[108px] h-[128px] w-[128px] opacity-70 [background-image:radial-gradient(circle,#1599ff_1px,transparent_1.3px)] [background-size:16px_16px] dark:opacity-55" />
+      <svg className="absolute inset-x-0 bottom-[250px] h-[190px] w-full opacity-50 dark:opacity-40" viewBox="0 0 1600 190" fill="none" preserveAspectRatio="none">
+        {Array.from({ length: 18 }).map((_, index) => (
+          <path
+            key={index}
+            d={`M-40 ${126 + index * 5}C138 ${46 + index * 3} 264 ${160 + index * 2} 420 ${120 + index * 4}C654 ${61 + index * 4} 770 ${95 + index * 2} 930 ${118 + index * 3}C1150 ${150 + index * 2} 1372 ${142 - index * 2} 1640 ${20 + index * 5}`}
+            stroke="url(#waveStroke)"
+            strokeWidth=".8"
+          />
+        ))}
+        <defs>
+          <linearGradient id="waveStroke" x1="0" y1="0" x2="1600" y2="0">
+            <stop stopColor="#0b7cff" />
+            <stop offset=".5" stopColor="#66d4ff" stopOpacity=".25" />
+            <stop offset="1" stopColor="#0989ff" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-x-0 top-0 h-[560px] bg-[radial-gradient(circle_at_72%_10%,rgba(0,154,255,0.14),transparent_34%),radial-gradient(circle_at_92%_36%,rgba(18,185,170,0.12),transparent_28%)] dark:bg-[radial-gradient(circle_at_70%_8%,rgba(9,94,232,0.18),transparent_34%),radial-gradient(circle_at_88%_34%,rgba(18,185,170,0.13),transparent_30%)]" />
+    </div>
+  );
+}
+
+function FeatureRail() {
+  return (
+    <section id="features" className="relative z-10 mx-auto w-full max-w-[1500px] px-6">
+      <div className="grid grid-cols-1 rounded-[12px] border border-[#d8e6f5] bg-white/86 shadow-[0_18px_40px_rgba(14,38,92,0.06)] backdrop-blur dark:border-white/12 dark:bg-[#0a1428]/88 md:grid-cols-2 xl:grid-cols-4">
+        {features.map((feature, index) => {
+          const Icon = feature.icon;
+          return (
+            <article
+              key={feature.title}
+              className={`flex items-center gap-5 px-9 py-6 ${
+                index > 0 ? "border-t border-[#d8e6f5] dark:border-white/12 md:border-l md:border-t-0" : ""
+              }`}
+            >
+              <div className="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-full border border-[#d6e4fb] bg-[#eef5ff] text-[#315bff] dark:border-white/10 dark:bg-white/5">
+                <Icon className="h-11 w-11" strokeWidth={1.9} />
+              </div>
+              <div>
+                <h2 className="text-[16px] font-extrabold text-[#06185a] dark:text-white">{feature.title}</h2>
+                <p className="mt-2 text-[14px] font-medium leading-6 text-[#0a1f63]/82 dark:text-white/82">
+                  {feature.description}
+                </p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function TechnologyPanel() {
+  return (
+    <section id="resources" className="relative z-10 mx-auto grid w-full max-w-[1500px] gap-4 px-6 pb-7 pt-4 lg:grid-cols-[1.25fr_.95fr]">
+      <div className="grid overflow-hidden rounded-[12px] border border-[#d8e6f5] bg-white/86 shadow-[0_18px_40px_rgba(14,38,92,0.06)] backdrop-blur dark:border-white/12 dark:bg-[#0a1428]/88 md:grid-cols-[170px_1fr]">
+        <div className="flex items-center border-b border-[#e0ebf7] px-6 py-5 dark:border-white/10 md:border-b-0 md:border-r">
+          <h2 className="text-[16px] font-extrabold leading-7 text-[#06185a] dark:text-white">
+            Built with
+            <br />
+            best-in-class
+            <br />
+            technologies
+          </h2>
+        </div>
+        <div className="grid grid-cols-3 items-center gap-4 px-7 py-5 sm:grid-cols-4 lg:grid-cols-7">
+          {technologies.map((tech) => (
+            <div key={tech.label} className="flex min-w-0 flex-col items-center gap-1.5 text-center">
+              <div
+                className="flex h-12 min-w-12 items-center justify-center rounded-lg text-[24px] font-extrabold"
+                style={{ color: tech.color }}
+              >
+                {tech.mark}
+              </div>
+              <span className="text-[13px] font-medium leading-tight text-[#06185a] dark:text-white/86">{tech.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative overflow-hidden rounded-[12px] border border-[#d8e6f5] bg-white/86 px-7 py-6 shadow-[0_18px_40px_rgba(14,38,92,0.06)] backdrop-blur dark:border-white/12 dark:bg-[#0a1428]/88">
+        <h2 className="relative z-10 max-w-[360px] text-[14px] font-bold leading-6 text-[#06185a] dark:text-white">
+          Everything you need to ensure quality, reliability, and confidence in every release.
+        </h2>
+        <div className="absolute bottom-0 right-4 flex h-[116px] w-[330px] items-end justify-end opacity-85">
+          <div className="mr-3 flex items-end gap-2">
+            <span className="h-9 w-6 rounded-t bg-[#3dd5d0]" />
+            <span className="h-14 w-6 rounded-t bg-[#1c80ff]" />
+            <span className="h-20 w-6 rounded-t bg-[#46d6ff]" />
+            <span className="h-28 w-6 rounded-t bg-[#1f5fff]" />
+          </div>
+          <div className="relative h-[100px] w-[170px] rounded-t-[8px] border border-[#1d62d8] bg-[#eaf4ff] dark:bg-[#0c2456]">
+            <div className="h-5 rounded-t-[8px] bg-[#2c65dc]" />
+            <div className="grid grid-cols-2 gap-2 p-3">
+              <span className="h-8 rounded bg-white dark:bg-white/10" />
+              <span className="h-8 rounded bg-white dark:bg-white/10" />
+              <span className="h-8 rounded bg-white dark:bg-white/10" />
+              <span className="h-8 rounded bg-white dark:bg-white/10" />
+            </div>
+            <span className="absolute -bottom-6 right-0 h-16 w-16 rounded-full border-[7px] border-[#284d91] bg-transparent" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PricingSection() {
+  return (
+    <section id="pricing" className="bg-[#f7fbff] px-6 py-20 dark:bg-[#061024]">
+      <div className="mx-auto max-w-5xl text-center">
+        <p className="text-sm font-bold uppercase tracking-[0.22em] text-[#12b9aa]">Pricing</p>
+        <h2 className="mt-3 text-4xl font-extrabold text-[#06185a] dark:text-white">Simple, Transparent Pricing</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-base font-medium text-[#0a1f63]/70 dark:text-white/70">
+          Start free, then scale monitoring across clients, releases, and environments.
+        </p>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {[
+            ["Professional", "$299", "For growing engineering teams."],
+            ["Enterprise", "$899", "For mission-critical QA operations."],
+          ].map(([name, price, description], index) => (
+            <article
+              key={name}
+              className={`rounded-[12px] border p-8 text-left ${
+                index === 1
+                  ? "border-[#095ee8] bg-[#095ee8] text-white shadow-[0_20px_50px_rgba(9,94,232,0.24)]"
+                  : "border-[#d8e6f5] bg-white text-[#06185a] dark:border-white/12 dark:bg-[#0a1428] dark:text-white"
+              }`}
+            >
+              <h3 className="text-2xl font-extrabold">{name}</h3>
+              <p className={`mt-2 text-sm font-medium ${index === 1 ? "text-white/76" : "text-[#0a1f63]/70 dark:text-white/70"}`}>
+                {description}
+              </p>
+              <div className="mt-7 flex items-end gap-1">
+                <span className="text-5xl font-extrabold">{price}</span>
+                <span className={`pb-2 text-base ${index === 1 ? "text-white/78" : "text-[#0a1f63]/62 dark:text-white/62"}`}>/mo</span>
+              </div>
+              <ul className="mt-7 space-y-3 text-sm font-semibold">
+                {["Real-time alerts", "Execution history", "Dashboard insights", "Priority support"].map((feature) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <CheckCircle2 className={`h-5 w-5 ${index === 1 ? "text-white" : "text-[#12b9aa]"}`} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 export default function Landing() {
-  const { theme, toggle } = useTheme();
+  const { theme, toggleTheme } = useAppTheme();
   const isDark = theme === "dark";
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-300 ${isDark ? "dark bg-[#070d1f]" : "bg-white"}`}>
+    <main className="min-h-screen overflow-hidden bg-white font-sans text-[#06185a] antialiased dark:bg-[#030814] dark:text-white">
+      <section
+        id="product"
+        className="relative min-h-screen bg-[#f7fbff] pb-5 pt-[170px] dark:bg-[#030814] lg:pt-[148px]"
+      >
+        <HeroBackground />
 
-      {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors ${
-        isDark
-          ? "bg-[#070d1f]/90 backdrop-blur border-white/5"
-          : "bg-white/90 backdrop-blur border-slate-200/80"
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 h-[60px] flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <img src={logoUrl} alt="Assuredia" className="h-8 w-auto" />
-            <div>
-              <span className="font-extrabold text-base tracking-wide">
-                <span className="text-[#0B5ED7]">ASSURE</span>
-                <span className={isDark ? "text-white" : "text-slate-900"}>DIA</span>
-              </span>
-              <p className="text-[9px] tracking-widest text-slate-400 dark:text-slate-500 -mt-0.5 font-medium">
-                — Detect. Inform. Action. —
-              </p>
-            </div>
-          </div>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="fixed right-4 top-[118px] z-50 flex h-[50px] w-[50px] items-center justify-center rounded-full border border-[#2468ff]/45 bg-white/80 text-[#06185a] shadow-[0_14px_34px_rgba(9,94,232,0.18)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#12b9aa] dark:border-[#3568e8]/60 dark:bg-[#081427]/84 dark:text-white sm:right-6 lg:right-8 lg:top-[122px]"
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
 
-          {/* Nav Links */}
-          <div className="hidden lg:flex items-center gap-6">
-            <NavDropdown label="Product" />
-            <a href="#features" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B5ED7] dark:hover:text-[#14B8A6] transition-colors">Features</a>
-            <NavDropdown label="Solutions" />
-            <a href="#pricing" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B5ED7] dark:hover:text-[#14B8A6] transition-colors">Pricing</a>
-            <NavDropdown label="Resources" />
-            <a href="#" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0B5ED7] dark:hover:text-[#14B8A6] transition-colors">About</a>
-          </div>
+        <header className="absolute inset-x-0 top-0 z-30">
+          <div className="mx-auto flex h-[108px] max-w-[1500px] items-center justify-between px-6">
+            <Brand />
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggle}
-              className={`p-2 rounded-lg transition-colors ${
-                isDark
-                  ? "text-slate-400 hover:text-white hover:bg-white/10"
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
-              }`}
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            <Link href="/dashboard">
-              <button className={`text-sm font-medium px-4 py-2 rounded-lg border transition-colors ${
-                isDark
-                  ? "border-white/20 text-white hover:bg-white/10"
-                  : "border-slate-300 text-slate-700 hover:bg-slate-50"
-              }`}>
+            <nav className="hidden items-center gap-7 lg:flex xl:gap-10" aria-label="Main navigation">
+              {navItems.map((item) => (
+                <NavLink key={item.label} item={item} />
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="hidden h-[52px] items-center whitespace-nowrap rounded-[8px] border border-[#2468ff]/55 px-6 text-[16px] font-bold text-[#06185a] transition hover:border-[#12b9aa] dark:text-white sm:flex"
+              >
                 Log In
-              </button>
-            </Link>
-            <Link href="/dashboard">
-              <button className="text-sm font-semibold px-5 py-2 rounded-lg bg-[#0B5ED7] hover:bg-[#0a52c0] text-white transition-colors shadow-sm shadow-[#0B5ED7]/30">
+              </Link>
+              <Link
+                href="/dashboard"
+                className="flex h-[52px] items-center whitespace-nowrap rounded-[8px] bg-[linear-gradient(100deg,#095eff,#12b9aa)] px-6 text-[16px] font-bold text-white shadow-[0_13px_30px_rgba(9,94,232,0.22)] transition hover:-translate-y-0.5"
+              >
                 Get Started
-              </button>
-            </Link>
+              </Link>
+            </div>
           </div>
-        </div>
-      </nav>
+          <nav className="mx-auto flex max-w-[1500px] gap-5 overflow-x-auto px-6 pb-3 text-sm font-bold text-[#06185a] dark:text-white/90 lg:hidden" aria-label="Main navigation">
+            {navItems.map((item) => (
+              <a key={item.label} href={item.href} className="shrink-0">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </header>
 
-      {/* Hero Section */}
-      <section className={`pt-[60px] min-h-screen flex flex-col transition-colors ${
-        isDark
-          ? "bg-gradient-to-br from-[#070d1f] via-[#0a1530] to-[#070d1f]"
-          : "bg-gradient-to-br from-[#f0f6ff] via-white to-[#f5fbfb]"
-      }`}>
-        {/* Background effects */}
-        {isDark && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full bg-[#0B5ED7]/5 blur-3xl" />
-            <div className="absolute bottom-40 right-1/4 w-80 h-80 rounded-full bg-[#14B8A6]/5 blur-3xl" />
-            {/* Dot grid */}
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)`,
-              backgroundSize: "30px 30px"
-            }} />
-          </div>
-        )}
-        {!isDark && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#e8f2ff]/40 to-transparent" />
-          </div>
-        )}
+        <div className="relative z-10 mx-auto grid max-w-[1500px] items-center gap-8 px-6 lg:grid-cols-[.72fr_1.28fr]">
+          <div className="max-w-[560px] pt-10 lg:pt-0">
+            <div className="mb-9 inline-flex items-center gap-3 rounded-full border border-[#12b9aa]/40 bg-white/70 px-4 py-2 text-[13px] font-bold text-[#06185a] shadow-[0_8px_24px_rgba(14,38,92,0.06)] dark:border-[#12b9aa]/50 dark:bg-[#081427]/85 dark:text-white">
+              <span className="h-3.5 w-3.5 rounded-full bg-[#12b9aa] shadow-[0_0_14px_rgba(18,185,170,0.9)]" />
+              Continuous QA Monitoring
+            </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 flex-1 flex flex-col">
-          <div className="flex-1 flex items-center py-12 gap-12">
-            {/* Left column */}
-            <div className="flex-1 max-w-lg">
-              {/* Badge */}
-              <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-7 border ${
-                isDark
-                  ? "bg-[#14B8A6]/10 border-[#14B8A6]/30 text-[#14B8A6]"
-                  : "bg-[#14B8A6]/10 border-[#14B8A6]/20 text-[#0f9688]"
-              }`}>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6] animate-pulse" />
-                Continuous QA Monitoring
-              </div>
+            <h1 className="text-[clamp(52px,5vw,82px)] font-extrabold leading-[1.03] tracking-normal text-[#06185a] dark:text-white">
+              Always On.
+              <br />
+              Quality <span className="text-[#12b9aa]">Assured.</span>
+            </h1>
+            <p className="mt-6 text-[23px] font-medium leading-8 text-[#071a56]/86 dark:text-white/86">
+              Detect issues early. Inform instantly.
+              <br />
+              Take action with confidence.
+            </p>
 
-              {/* Headline */}
-              <h1 className={`text-5xl xl:text-6xl font-extrabold leading-[1.08] tracking-tight mb-5 ${
-                isDark ? "text-white" : "text-[#0d1b3e]"
-              }`}>
-                Always On.<br />
-                <span className="bg-gradient-to-r from-[#14B8A6] to-[#0ea5e9] bg-clip-text text-transparent">
-                  Quality Assured.
+            <div className="mt-8 flex flex-wrap gap-5">
+              <Link
+                href="/dashboard"
+                className="flex h-[58px] items-center gap-5 rounded-[8px] bg-[linear-gradient(100deg,#095eff,#12b9aa)] px-8 text-[17px] font-bold text-white shadow-[0_14px_34px_rgba(9,94,232,0.24)] transition hover:-translate-y-0.5"
+              >
+                Get Started
+                <ArrowRight className="h-6 w-6" />
+              </Link>
+              <a
+                href="#features"
+                className="flex h-[58px] items-center gap-5 rounded-[8px] border border-[#2468ff]/60 bg-white/70 px-8 text-[17px] font-bold text-[#06185a] transition hover:border-[#12b9aa] dark:bg-transparent dark:text-white"
+              >
+                View Demo
+                <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#2468ff] text-[#2468ff]">
+                  <Play className="ml-0.5 h-3 w-3 fill-current" />
                 </span>
-              </h1>
-
-              <p className={`text-base leading-relaxed mb-8 ${
-                isDark ? "text-slate-400" : "text-slate-600"
-              }`}>
-                Detect issues early. Inform instantly.<br />
-                Take action with confidence.
-              </p>
-
-              {/* CTAs */}
-              <div className="flex items-center gap-3">
-                <Link href="/dashboard">
-                  <button className="flex items-center gap-2 px-6 py-3 bg-[#0B5ED7] hover:bg-[#0a52c0] text-white font-semibold rounded-lg text-sm transition-all shadow-lg shadow-[#0B5ED7]/25 hover:shadow-[#0B5ED7]/40 hover:-translate-y-px">
-                    Get Started <ArrowRight className="h-4 w-4" />
-                  </button>
-                </Link>
-                <button className={`flex items-center gap-2 px-6 py-3 font-semibold rounded-lg text-sm border transition-all ${
-                  isDark
-                    ? "border-white/20 text-white hover:bg-white/10"
-                    : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                }`}>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                    isDark ? "bg-white/10 border border-white/20" : "bg-slate-100 border border-slate-200"
-                  }`}>
-                    <Play className="h-2.5 w-2.5 ml-0.5" fill="currentColor" />
-                  </div>
-                  View Demo
-                </button>
-              </div>
-            </div>
-
-            {/* Right column — 4-step process diagram */}
-            <div className="flex-1 flex flex-col items-center gap-0 relative">
-              {/* Top row: cards 1 & 2 */}
-              <div className="flex items-center gap-1">
-                <div className="relative">
-                  <ProcessCard step="1. Test" title="Test" desc="Automated UI & API tests run 24/7">
-                    <div className="relative w-full px-1">
-                      <BrowserMockup />
-                    </div>
-                  </ProcessCard>
-                </div>
-                <DashedArrow direction="right" />
-                <ProcessCard step="2. Detect" title="Detect" desc="Issues detected in real-time" active>
-                  <div className="w-10 h-10 rounded-full bg-[#0B5ED7] flex items-center justify-center shadow-lg shadow-[#0B5ED7]/30">
-                    <span className="text-white font-bold text-lg">!</span>
-                  </div>
-                </ProcessCard>
-                <DashedArrow direction="right" />
-                <ProcessCard step="3. Inform" title="Inform" desc="Instant alerts with rich context">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="relative">
-                      <Bell className="w-8 h-8 text-[#0B5ED7] dark:text-[#60a5fa]" />
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">1</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Send className="w-4 h-4 text-[#0B5ED7] dark:text-[#60a5fa]" />
-                      <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-400"}`}>+</span>
-                      <div className={`w-4 h-4 rounded flex items-center justify-center ${isDark ? "bg-slate-700" : "bg-slate-100"}`}>
-                        <TrendingUp className="w-2.5 h-2.5 text-slate-400" />
-                      </div>
-                    </div>
-                  </div>
-                </ProcessCard>
-                <DashedArrow direction="right" />
-                <ProcessCard step="4. Action" title="Action" desc="Resolve faster with insights & automation">
-                  <div className="w-10 h-10 rounded-full bg-[#14B8A6]/15 border border-[#14B8A6]/30 flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-[#14B8A6]" />
-                  </div>
-                </ProcessCard>
-              </div>
-
-              {/* Curved arrows row */}
-              <div className="flex w-full px-6 justify-between items-center h-8">
-                <svg width="100%" height="32" viewBox="0 0 640 32" fill="none" preserveAspectRatio="none">
-                  <path d="M40 4 C100 4 540 4 600 4" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round" />
-                  <path d="M40 4 L40 28" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round" />
-                  <path d="M600 4 L600 28" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round" />
-                  <polygon points="36,22 40,30 44,22" fill="#3b82f6" opacity="0.7" />
-                  <polygon points="596,22 600,30 604,22" fill="#3b82f6" opacity="0.7" />
-                </svg>
-              </div>
+              </a>
             </div>
           </div>
 
-          {/* System Status Bar */}
-          <div className={`flex items-center justify-center gap-4 py-4 border-t text-sm ${
-            isDark ? "border-white/5 text-slate-400" : "border-slate-200/80 text-slate-500"
-          }`}>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse shadow-[0_0_6px_rgba(20,184,166,0.7)]" />
-              <span className="text-xs font-medium">System Status</span>
-            </div>
-            <span className="text-[#14B8A6] text-xs font-semibold">All Systems Operational</span>
-            <UptimeLine />
-            <span className="text-xs font-semibold">99.98% Uptime</span>
+          <div className="hidden lg:block">
+            <ProcessFlow />
+            <StatusBar />
           </div>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section id="features" className={`py-10 px-6 transition-colors ${
-        isDark ? "bg-[#0a1120] border-t border-b border-white/5" : "bg-slate-50/80 border-t border-b border-slate-200/80"
-      }`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              {
-                icon: <Brain className="w-5 h-5" />,
-                title: "AI-Powered Insights",
-                desc: "Smart analysis and self-healing capabilities to keep your tests resilient and up to date.",
-                color: "text-[#0B5ED7]",
-                bg: isDark ? "bg-[#0B5ED7]/10" : "bg-[#0B5ED7]/10",
-              },
-              {
-                icon: <Monitor className="w-5 h-5" />,
-                title: "24/7 Monitoring",
-                desc: "Round-the-clock monitoring across all environments to ensure system stability.",
-                color: "text-[#14B8A6]",
-                bg: isDark ? "bg-[#14B8A6]/10" : "bg-[#14B8A6]/10",
-              },
-              {
-                icon: <Send className="w-5 h-5" />,
-                title: "Instant Notifications",
-                desc: "Real-time alerts via Telegram with rich details and screenshots for faster response.",
-                color: "text-[#0B5ED7]",
-                bg: isDark ? "bg-[#0B5ED7]/10" : "bg-[#0B5ED7]/10",
-              },
-              {
-                icon: <Cloud className="w-5 h-5" />,
-                title: "Scalable & Reliable",
-                desc: "Built with Docker and AWS for high availability, scalability, and performance.",
-                color: "text-[#14B8A6]",
-                bg: isDark ? "bg-[#14B8A6]/10" : "bg-[#14B8A6]/10",
-              },
-            ].map((f, i) => (
-              <div key={i} className="flex gap-3">
-                <div className={`w-10 h-10 rounded-xl ${f.bg} flex items-center justify-center shrink-0 ${f.color}`}>
-                  {f.icon}
+        <div className="relative z-10 mt-7 lg:hidden">
+          <div className="mx-6 rounded-[12px] border border-[#d8e6f5] bg-white/84 p-5 dark:border-white/12 dark:bg-[#0a1428]/88">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {["1. Test", "2. Detect", "3. Inform", "4. Action"].map((step) => (
+                <div key={step} className="rounded-[8px] border border-[#d8e6f5] p-4 text-sm font-extrabold dark:border-white/12">
+                  {step}
                 </div>
-                <div>
-                  <h3 className={`text-sm font-bold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>{f.title}</h3>
-                  <p className={`text-xs leading-relaxed ${isDark ? "text-slate-400" : "text-slate-500"}`}>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Technologies + CTA */}
-      <section className={`py-8 px-6 transition-colors ${isDark ? "bg-[#070d1f]" : "bg-white"}`}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 items-stretch">
-          {/* Tech logos */}
-          <div className={`flex-1 flex flex-col justify-center p-6 rounded-2xl border ${
-            isDark ? "bg-[#0a1120] border-white/5" : "bg-slate-50 border-slate-200"
-          }`}>
-            <p className={`text-xs font-bold uppercase tracking-wider mb-5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-              Built with best-in-class technologies
-            </p>
-            <div className="flex flex-wrap items-center gap-5">
-              {/* Java */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-base font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span style={{ color: "#f89820" }}>J</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Java</span>
-              </div>
-              {/* Selenium */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span style={{ color: "#43b02a" }}>Se</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selenium</span>
-              </div>
-              {/* REST */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[9px] font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span className={isDark ? "text-white" : "text-slate-700"}>REST</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Assured</span>
-              </div>
-              {/* n8n */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span style={{ color: "#ea4b71" }}>n8n</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>n8n</span>
-              </div>
-              {/* AWS */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span style={{ color: "#ff9900" }}>aws</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>AWS</span>
-              </div>
-              {/* Docker */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span style={{ color: "#2496ed" }}>D</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Docker</span>
-              </div>
-              {/* AI */}
-              <div className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[9px] font-bold ${isDark ? "bg-white/5" : "bg-white border border-slate-200"}`}>
-                  <span className={isDark ? "text-white" : "text-slate-700"}>AI</span>
-                </div>
-                <span className={`text-[9px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>AI Integration</span>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA card */}
-          <div className={`md:w-80 p-6 rounded-2xl border flex flex-col justify-between ${
-            isDark ? "bg-[#0a1120] border-white/5" : "bg-slate-50 border-slate-200"
-          }`}>
-            <div>
-              <p className={`text-sm font-semibold leading-snug mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>
-                Everything you need to ensure quality, reliability, and confidence in every release.
-              </p>
-              <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                Get started in minutes. No credit card required.
-              </p>
-            </div>
-            <div className={`mt-4 rounded-xl overflow-hidden border ${isDark ? "border-white/5 bg-[#0d1b3e]" : "border-slate-200 bg-white"} p-3`}>
-              {/* Mini dashboard illustration */}
-              <div className="grid grid-cols-3 gap-1.5 mb-2">
-                {[
-                  { label: "97.3%", color: "text-[#14B8A6]" },
-                  { label: "1,835", color: isDark ? "text-white" : "text-slate-800" },
-                  { label: "42", color: "text-red-400" },
-                ].map((m, i) => (
-                  <div key={i} className={`rounded-lg p-1.5 text-center ${isDark ? "bg-white/5" : "bg-slate-50 border border-slate-100"}`}>
-                    <div className={`text-xs font-bold ${m.color}`}>{m.label}</div>
-                    <div className={`text-[8px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                      {["Success", "Tests", "Issues"][i]}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className={`h-14 rounded-lg flex items-center justify-center ${isDark ? "bg-white/5" : "bg-slate-50 border border-slate-100"}`}>
-                <svg width="100%" height="40" viewBox="0 0 200 40">
-                  <polyline points="0,35 20,30 40,20 60,25 80,10 100,15 120,22 140,18 160,25 180,12 200,20"
-                    fill="none" stroke="#0B5ED7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <polyline points="0,38 20,36 40,34 60,37 80,32 100,35 120,30 140,33 160,31 180,34 200,32"
-                    fill="none" stroke="#ef4444" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-                </svg>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Pricing */}
-      <section id="pricing" className={`py-20 px-6 transition-colors ${
-        isDark ? "bg-[#0a1120]" : "bg-slate-50"
-      }`}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className={`text-3xl font-extrabold mb-3 ${isDark ? "text-white" : "text-slate-900"}`}>
-              Simple, Transparent Pricing
-            </h2>
-            <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              Start free. Scale as you grow.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {[
-              {
-                name: "Professional", price: "$299", period: "/mo",
-                desc: "For growing engineering teams.",
-                features: ["Up to 50 monitored clients", "Real-time Slack/Discord alerts", "30-day data retention", "Standard support"],
-                cta: "Start Free Trial", featured: false,
-              },
-              {
-                name: "Enterprise", price: "$899", period: "/mo",
-                desc: "For mission-critical deployments.",
-                features: ["Unlimited monitored clients", "Custom webhook integrations", "1-year data retention", "Dedicated success manager", "SSO & Advanced Security"],
-                cta: "Contact Sales", featured: true,
-              },
-            ].map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-8 border transition-all ${
-                plan.featured
-                  ? "bg-[#0B5ED7] border-[#0B5ED7] text-white shadow-xl shadow-[#0B5ED7]/20"
-                  : isDark
-                    ? "bg-[#0d1528] border-white/10 text-white"
-                    : "bg-white border-slate-200 text-slate-900"
-              }`}>
-                {plan.featured && (
-                  <div className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 text-white mb-3 uppercase tracking-wider">
-                    Most Popular
-                  </div>
-                )}
-                <h3 className={`text-xl font-bold mb-1 ${plan.featured ? "text-white" : isDark ? "text-white" : "text-slate-900"}`}>{plan.name}</h3>
-                <p className={`text-xs mb-5 ${plan.featured ? "text-blue-100" : isDark ? "text-slate-400" : "text-slate-500"}`}>{plan.desc}</p>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className={`text-4xl font-extrabold ${plan.featured ? "text-white" : isDark ? "text-white" : "text-slate-900"}`}>{plan.price}</span>
-                  <span className={`text-sm ${plan.featured ? "text-blue-100" : isDark ? "text-slate-400" : "text-slate-400"}`}>{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-7">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2.5 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${plan.featured ? "text-white" : "text-[#14B8A6]"}`} />
-                      <span className={plan.featured ? "text-blue-50" : isDark ? "text-slate-300" : "text-slate-600"}>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${
-                  plan.featured
-                    ? "bg-white text-[#0B5ED7] hover:bg-blue-50"
-                    : isDark
-                      ? "bg-white/10 text-white hover:bg-white/20 border border-white/10"
-                      : "bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200"
-                }`}>
-                  {plan.cta}
-                </button>
-              </div>
-            ))}
-          </div>
+        <div className="mt-7">
+          <FeatureRail />
+          <TechnologyPanel />
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={`py-10 px-6 border-t transition-colors ${
-        isDark ? "bg-[#070d1f] border-white/5" : "bg-white border-slate-200"
-      }`}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 opacity-60">
-            <img src={logoUrl} alt="Assuredia" className="h-6 w-auto" />
-            <span className={`font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>Assuredia</span>
-          </div>
-          <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-            © 2025 Assuredia QA Monitoring. All rights reserved.
+      <section id="solutions" className="bg-white px-6 py-20 dark:bg-[#050d1d]">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-[#12b9aa]">Solutions</p>
+          <h2 className="mt-3 text-4xl font-extrabold text-[#06185a] dark:text-white">Release confidence for every team</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base font-medium text-[#0a1f63]/70 dark:text-white/70">
+            Monitor UI flows, API checks, client environments, and action workflows from one operational command center.
           </p>
         </div>
-      </footer>
-    </div>
+      </section>
+
+      <PricingSection />
+
+      <section id="about" className="bg-white px-6 py-16 dark:bg-[#050d1d]">
+        <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-6 border-t border-[#d8e6f5] pt-10 dark:border-white/12 md:flex-row">
+          <Brand />
+          <p className="text-sm font-medium text-[#0a1f63]/62 dark:text-white/62">
+            © 2026 Assuredia QA Monitoring. All rights reserved.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }

@@ -23,7 +23,7 @@ export default function Settings() {
 
   const handleClientChange = (val: string) => {
     setSelectedClient(val);
-    const client = clients?.find(c => c.id.toString() === val);
+    const client = Array.isArray(clients) ? clients.find(c => c.id.toString() === val) : undefined;
     if (client) {
       setWebhookUrl(client.webhookUrl || "");
     }
@@ -117,7 +117,7 @@ export default function Settings() {
                         <SelectValue placeholder="Choose a client environment" />
                       </SelectTrigger>
                       <SelectContent>
-                        {clients?.map((c) => (
+                        {Array.isArray(clients) && clients.map((c) => (
                           <SelectItem key={c.id} value={c.id.toString()}>{c.name} ({c.environment})</SelectItem>
                         ))}
                       </SelectContent>
