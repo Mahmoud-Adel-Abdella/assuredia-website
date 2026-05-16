@@ -179,5 +179,76 @@ router.get("/test-runs/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+const webhookResultSchema = z.object({
+  client: z.string(),
+  flow: z.string(),
+  status: z.string(),
+  total: z.number(),
+  passed: z.number(),
+  failed: z.number(),
+  skipped: z.number(),
+  durationSeconds: z.number(),
+  failures: z.array(z.object({
+    testName: z.string(),
+    errorMessage: z.string().nullable().optional(),
+    screenshotPath: z.string().nullable().optional(),
+  })).optional(),
+});
+
+router.post("/test-runs/webhook", async (req, res) => {
+  const parsed = webhookResultSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid body" });
+    return;
+  }
+  try {
+    const { client, flow, status, total, passed, failed, skipped, durationSeconds, failures } = parsed.data;
+
+    // ابحث عن الـ client
+    const [clientRow] = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.clientName, client));
+
+    if (!clientRow) {
+      res.status(404).json({ error: "Client not found" });
+      return;
+    }
+
+    const flowRow = await getOrCreateFlow(clientRow.id, flow);
+
+    const [run] = await db
+      .insert(testRuns)
+      .values({
+        clientId: clientRow.id,
+        flowId: flowRow.id,
+        status,
+        total,
+        passed,
+        failed,
+        skipped,
+        durationSeconds,
+        timestamp: new Date(),
+      })
+      .returning();
+
+    // احفظ الـ failures
+    if (failures && failures.length > 0) {
+      await db.insert(testFailures).values(
+        failures.map(f => ({
+          runId: run.id,
+          testName: f.testName,
+          errorMessage: f.errorMessage ?? null,
+          screenshotPath: f.screenshotPath ?? null,
+        }))
+      );
+    }
+
+    res.status(201).json({ success: true, runId: run.id });
+  } catch (err) {
+    req.log.error({ err }, "Failed to save webhook result");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;
