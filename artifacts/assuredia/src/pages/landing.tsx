@@ -499,7 +499,7 @@ export default function Landing() {
             </div>
 
             <h2 className="text-5xl xl:text-6xl font-black leading-tight tracking-tight mb-6">
-              Always <span className="bg-gradient-to-r from-green-300 to-teal-400 bg-clip-text text-transparent">On.</span>
+              Always <span className="text-[#12b9aa]">On.</span>
               <br />
               <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
                 Quality Assured.
