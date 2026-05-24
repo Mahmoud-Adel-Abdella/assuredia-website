@@ -489,8 +489,8 @@ export default function Landing() {
         </header>
 
         <div className="relative z-10 mx-auto grid max-w-[1500px] items-center gap-8 px-6 lg:grid-cols-[.72fr_1.28fr]">
-          <div className="max-w-[560px] pt-10 lg:pt-0">
-            <div className="mb-9 inline-flex items-center gap-3 rounded-full border border-[#12b9aa]/40 bg-white/70 px-4 py-2 text-[13px] font-bold text-[#06185a] shadow-[0_8px_24px_rgba(14,38,92,0.06)] dark:border-[#12b9aa]/50 dark:bg-[#081427]/85 dark:text-white">
+          <div className="max-w-xl">
+            <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-[#12b9aa]/40 bg-white/70 px-4 py-2 text-[13px] font-bold text-[#06185a] shadow-[0_8px_24px_rgba(14,38,92,0.06)] dark:border-[#12b9aa]/50 dark:bg-[#081427]/85 dark:text-white">
         <span className="relative flex h-[10px] w-[10px]">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#12b9aa] opacity-40" />
           <span className="relative inline-flex h-[10px] w-[10px] rounded-full bg-[#12b9aa] shadow-[0_0_8px_rgba(18,185,170,0.5)]" />
@@ -498,17 +498,13 @@ export default function Landing() {
               Continuous QA Monitoring
             </div>
 
-            <h1 className="text-[clamp(52px,5vw,82px)] font-extrabold leading-[1.03] tracking-normal text-[#06185a] dark:text-white">
-              Always On.
+            <h2 className="text-5xl xl:text-6xl font-black leading-tight tracking-tight mb-6">
+              Always <span className="bg-gradient-to-r from-green-300 to-teal-400 bg-clip-text text-transparent">On.</span>
               <br />
-              Quality <span className="text-[#12b9aa]">Assured.</span>
-            </h1>
-            <p className="mt-6 text-[23px] font-medium leading-8 text-[#071a56]/86 dark:text-white/86">
-              Detect issues early. Inform instantly.
-              <br />
-              Take action with confidence.
-            </p>
-
+              <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
+                Quality Assured.
+              </span>
+            </h2>  
             <div className="mt-8 flex flex-wrap gap-5">
               <Link
                 to="/auth?mode=signup"
@@ -517,15 +513,6 @@ export default function Landing() {
                 Get Started
                 <ArrowRight className="h-6 w-6" />
               </Link>
-              <a
-                href="#features"
-                className="flex h-[58px] items-center gap-5 rounded-[8px] border border-[#2468ff]/60 bg-white/70 px-8 text-[17px] font-bold text-[#06185a] transition hover:border-[#12b9aa] dark:bg-transparent dark:text-white"
-              >
-                View Demo
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#2468ff] text-[#2468ff]">
-                  <Play className="ml-0.5 h-3 w-3 fill-current" />
-                </span>
-              </a>
             </div>
           </div>
 
