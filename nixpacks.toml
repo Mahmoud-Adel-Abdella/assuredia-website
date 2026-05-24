@@ -6,7 +6,7 @@ cmds = [
 
 [phases.build]
 cmds = [
-  "pnpm --filter @workspace/api-server build"
+  "cd artifacts/api-server && pnpm build"
 ]
 
 [start]
