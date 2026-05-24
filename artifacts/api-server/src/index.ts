@@ -1,5 +1,9 @@
-import app from "./app";
+import app from "./routes/app";
 import { logger } from "./lib/logger";
+import 'dotenv/config';
+import authRoutes from "./routes/auth";
+// ... بعد باقي الـ routes
+app.use("/api/auth", authRoutes);
 
 const rawPort = process.env["PORT"];
 

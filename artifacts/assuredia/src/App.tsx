@@ -1,45 +1,45 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppThemeProvider } from "@/context/ThemeContext";
-import NotFound from "@/pages/not-found";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Auth from "./pages/auth";
+import Landing from "./pages/landing";
+import Dashboard from "./pages/dashboard";
+import Clients from "./pages/clients";
+import AdminClients from "./pages/adminClients";
+import { RoleBasedRoute } from "./components/RoleBasedRoute";
+import { AppThemeProvider } from "./context/ThemeContext"; 
 
-import Landing from "@/pages/landing";
-import Dashboard from "@/pages/dashboard";
-import Clients from "@/pages/clients";
-import Alerts from "@/pages/alerts";
-import Reports from "@/pages/reports";
-import Settings from "@/pages/settings";
-
-const queryClient = new QueryClient();
-
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={Landing} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/clients" component={Clients} />
-      <Route path="/alerts" component={Alerts} />
-      <Route path="/reports" component={Reports} />
-      <Route path="/settings" component={Settings} />
-      <Route component={NotFound} />
-    </Switch>
-  );
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const token = localStorage.getItem("token");
+  return token ? <>{children}</> : <Navigate to="/auth" />;
 }
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppThemeProvider>
-        <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
-      </AppThemeProvider>
-    </QueryClientProvider>
+    <AppThemeProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
+        
+        {/* ✅ المسار المحدد يجب أن يأتي قبل المسار العام "*" */}
+        <Route
+          path="/admin/clients"
+          element={
+            <PrivateRoute>
+              <RoleBasedRoute allowedRoles={["admin"]}>
+                <AdminClients />
+              </RoleBasedRoute>
+            </PrivateRoute>
+          }
+        />
+        
+        {/* ✨ أخيراً، المسار العام (يجب أن يكون آخر Route) */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+    </AppThemeProvider>
   );
 }
 

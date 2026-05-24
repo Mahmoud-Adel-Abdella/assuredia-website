@@ -18,8 +18,13 @@ export const clients = pgTable("clients", {
   isActive: boolean("is_active").default(true),
   aiActive: boolean("ai_active").default(false),
   notifyPolicy: text("notify_policy"),
-  webhookUrl: text("webhook_url"),
   createdAt: timestamp("created_at").defaultNow(),
+  role: text("role").default("client").notNull(),
+  // الأعمدة الجديدة
+  username: text("username"),
+  passwordHash: text("password_hash"),
+  telegramUsername: text("telegram_username"),
+  onboardingToken: text("onboarding_token").unique(),
 });
 
 export const flows = pgTable("flows", {
@@ -46,8 +51,10 @@ export const scheduler = pgTable("scheduler", {
     .references(() => flows.id, { onDelete: "cascade" })
     .notNull(),
   cronExpression: text("cron_expression").notNull(),
-  lastRun: timestamp("last_run"),
   isActive: boolean("is_active").default(true),
+  nextRunAt: timestamp("next_run_at"),
+  lastRunAt: timestamp("last_run_at"),
+  isRunning: boolean("is_running").default(false),
 });
 
 export const testRuns = pgTable("test_runs", {
@@ -105,4 +112,22 @@ export const testFailuresRelations = relations(testFailures, ({ one }) => ({
     fields: [testFailures.runId],
     references: [testRuns.id],
   }),
+
+  
+}));
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: text("email").unique().notNull(),
+  passwordHash: text("password_hash").notNull(),
+  clientId: integer("client_id")
+    .references(() => clients.id, { onDelete: "cascade" })
+    .notNull(),
+  role: text("role").default("admin"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// أضف العلاقات إذا أردت (اختياري)
+export const usersRelations = relations(users, ({ one }) => ({
+  client: one(clients, { fields: [users.clientId], references: [clients.id] }),
 }));

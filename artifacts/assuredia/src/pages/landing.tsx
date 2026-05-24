@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom"; // تغيير من wouter إلى react-router-dom
 import {
   Activity,
   ArrowRight,
@@ -16,7 +16,7 @@ import {
   Sun,
 } from "lucide-react";
 import { useAppTheme } from "@/context/ThemeContext";
-import logoTransparentUrl from "@assets/assuredia-logo-transparent.svg";
+import logoTransparentUrl from "/native-logo.png";
 
 const navItems = [
   { label: "Product", href: "#product", dropdown: true },
@@ -79,7 +79,7 @@ function NavLink({ item }: { item: (typeof navItems)[number] }) {
 function Brand() {
   return (
     <a href="#product" className="flex shrink-0 items-center gap-3">
-      <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center" aria-hidden="true">
+      <span className="flex h-[80px] w-[80px] shrink-0 items-center justify-center" aria-hidden="true">
         <img
           src={logoTransparentUrl}
           alt=""
@@ -89,10 +89,10 @@ function Brand() {
         />
       </span>
       <span className="hidden leading-none min-[560px]:block">
-        <span className="block text-[22px] font-extrabold tracking-[0.10em] text-[#06185a] dark:text-white">
+        <span className="block text-[28px] font-extrabold tracking-[0.10em] text-[#06185a] dark:text-white">
           ASSURE<span className="text-[#12b9aa]">DIA</span>
         </span>
-        <span className="mt-0.5 block text-center text-[10px] font-semibold tracking-[0.06em] text-[#3d4f7c] dark:text-white/60">
+        <span className="mt-0.5 block text-center text-[12px] font-semibold tracking-[0.06em] text-[#3d4f7c] dark:text-white/60">
           Detect. <span className="text-[#0c56d9] dark:text-[#4a8af5]">|</span> Inform. <span className="text-[#0c56d9] dark:text-[#4a8af5]">|</span> Act.
         </span>
       </span>
@@ -466,13 +466,13 @@ export default function Landing() {
 
             <div className="flex items-center gap-4">
               <Link
-                href="/dashboard"
+                to="/auth"
                 className="hidden h-[52px] items-center whitespace-nowrap rounded-[8px] border border-[#2468ff]/55 px-6 text-[16px] font-bold text-[#06185a] transition hover:border-[#12b9aa] dark:text-white sm:flex"
               >
                 Log In
               </Link>
               <Link
-                href="/dashboard"
+                to="/auth?mode=signup"
                 className="flex h-[52px] items-center whitespace-nowrap rounded-[8px] bg-[linear-gradient(100deg,#095eff,#12b9aa)] px-6 text-[16px] font-bold text-white shadow-[0_13px_30px_rgba(9,94,232,0.22)] transition hover:-translate-y-0.5"
               >
                 Get Started
@@ -491,7 +491,10 @@ export default function Landing() {
         <div className="relative z-10 mx-auto grid max-w-[1500px] items-center gap-8 px-6 lg:grid-cols-[.72fr_1.28fr]">
           <div className="max-w-[560px] pt-10 lg:pt-0">
             <div className="mb-9 inline-flex items-center gap-3 rounded-full border border-[#12b9aa]/40 bg-white/70 px-4 py-2 text-[13px] font-bold text-[#06185a] shadow-[0_8px_24px_rgba(14,38,92,0.06)] dark:border-[#12b9aa]/50 dark:bg-[#081427]/85 dark:text-white">
-              <span className="h-3.5 w-3.5 rounded-full bg-[#12b9aa] shadow-[0_0_14px_rgba(18,185,170,0.9)]" />
+        <span className="relative flex h-[10px] w-[10px]">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#12b9aa] opacity-40" />
+          <span className="relative inline-flex h-[10px] w-[10px] rounded-full bg-[#12b9aa] shadow-[0_0_8px_rgba(18,185,170,0.5)]" />
+        </span>
               Continuous QA Monitoring
             </div>
 
@@ -508,7 +511,7 @@ export default function Landing() {
 
             <div className="mt-8 flex flex-wrap gap-5">
               <Link
-                href="/dashboard"
+                to="/auth?mode=signup"
                 className="flex h-[58px] items-center gap-5 rounded-[8px] bg-[linear-gradient(100deg,#095eff,#12b9aa)] px-8 text-[17px] font-bold text-white shadow-[0_14px_34px_rgba(9,94,232,0.24)] transition hover:-translate-y-0.5"
               >
                 Get Started
